@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <meta charset="utf-8"/>
+    <style>
+        /* 此样式仅用于浏览器页面效果，Excel不会分离表格边框，不需要此样式 */
+        table {
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<!-- 设置border="1"以显示表格框线 -->
+<table border="1" id="table-excel">
+    <!-- caption元素可以生成表标题，其单元格列跨度为表格的列数 -->
+    <caption>学生成绩表</caption>
+    <thead>
+    <tr>
+        <!-- 可以使用rowspan和colspan来合并单元格 -->
+        <th rowspan="2">编号</th>
+        <th rowspan="2">学号</th>
+        <th rowspan="2">姓名</th>
+        <th rowspan="2">性别</th>
+        <th rowspan="2">年龄</th>
+        <th colspan="3">成绩</th>
+    </tr>
+    <tr>
+        <th>语文</th>
+        <th>数学</th>
+        <th>英语</th>
+    </tr>
+    </thead>
+    <tbody id="dataBody">
+    <tr>
+        <td>1</td>
+        <td>12</td>
+        <td>张三</td>
+        <td>男</td>
+        <td>18</td>
+        <td>19</td>
+        <td>33</td>
+        <td>80</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>22</td>
+        <td>李四</td>
+        <td>男</td>
+        <td>28</td>
+        <td>39</td>
+        <td>33</td>
+        <td>80</td>
+    </tr>
+    </tbody>
+</table>
+
+
+<a id="eleAExport">页面静态数据</a>
+
+<a id="eleAExportExt">后台数据</a>
+
+<a id="tableA_ext">table 导出</a>
+
+<script src="frame-export-excel.js"></script>
+<script src="/js/jquery-1.8.2.js"></script>
+
+<script>
+
+    console.log("init data start")
+    var htmlVar = "";
+    var data = []
+    for (var i = 0; i < 10; i++) {
+        var itemData = {}
+        itemData["id"] = i;
+        itemData["no"] = i;
+        itemData["name"] = "Started Application in 7.004 seconds (JVM running for 7.381)";
+        itemData["sex"] = "adfasd啊第十三届饭卡是两地分居拉水电费阿斯顿发婕拉送达房男";
+        itemData["age"] = "12";
+        itemData["yw"] = "撒打发斯蒂芬就撒电缆附件";
+        itemData["sx"] = "92";
+        itemData["yy"] = "啊打发几哈的看法撒旦法哈萨克金凤凰卡收到反馈举案说法说待会饭卡是就打发阿斯顿发哈喀什酒店反函数";
+        data.push(itemData)
+    }
+    console.log("init data end")
+    console.log(data)
+
+    /********************页面有静态数据 start********************/
+    //data, eleA, fileName,loadDataSuccess
+    //local 表示本地数据，load 表示通过url 远程获取数据，table 表示导出html的一个table为excel
+    var col = [{"id": "编号"}, {"no": "学号"}, {"name": "姓名"}, {"sex": "性别"}, {"age": "年龄"}, {"yw": "语文"}, {"sx": "数学"}, {"yy": "英语"}]
+    var exportE = new ExportExcel({
+        "data": data,
+        "eleA": "eleAExport",
+        "type": "local", // 表示本地数据
+        "headers": col,  // 头信息
+        "fileName": "学生成绩",
+        "initSuccess": function () {   // 可以不传，默认，直接导出文件
+            console.log("--- load success ---");
+        }
+    });
+
+    exportE.init();
+    /*********************页面有静态数据 end*******************/
+
+
+    /**************************从后台获取数据 start*****************************/
+    // eleA, fileName,loadDataSuccess,requestType,requestData,requestUrl,responseDataType
+    // 注意，这里加了jquery 的ajax 请求，所以需要进入，jquery
+    var loadExport = new ExportExcel({
+        "eleA": "eleAExportExt",
+        "fileName": "后台数据",
+        "requestType": "get", // 可以不传，默认POST
+        "requestData": { // 请求数据
+            "size": 3 // 只生成三行数据
+        },
+        "headers": col,  // 头信息
+        "type": "load", // 表示通过url 远程获取数据,(默认就是 load)
+        "requestUrl": "/data/get.json",  // 请求 路径
+        "responseDataType": "json",  // 可以不传 默认 json
+        "initSuccess": function () {  // 可以不传，默认，直接导出文件
+            console.log("--- load  后台数据 success ---")
+            // 想要在这里执行导出，就执行 onExport 方法
+            loadExport.onExport(); // 导出
+        }
+    });
+    loadExport.init(); // 执行加载操作
+    /**************************从后台获取数据  end *****************************/
+
+
+    /**********************直接导出页面上的 table start **********************/
+    var tableExport = new ExportExcel({
+        "eleA": "tableA_ext",
+        "fileName": "页面table",
+        "type": "table", // 表示导出html的一个table为excel
+        //"headers": col,  // 头信息 table ，导出这里就不需要头信息了
+        "tableId": "table-excel"  // 页面的table ID
+        //initSuccess 回调可以不用传，默认操作是导出excel 文件
+    });
+    tableExport.init(); // 执行加载操作
+    /**************************直接导出页面上的 table  end *****************************/
+
+    console.log(loadExport)
+    console.log(tableExport)
+
+
+</script>
+</body>
+</html>
